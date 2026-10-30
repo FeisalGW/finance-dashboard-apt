@@ -1,0 +1,135 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0A09">
+<title>Keuangan The Hive</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0A09;--card:#151311;--line:#2B2720;--ink:#EFE8D6;--mut:#A9A08A;--gold:#D4AF55;--bronze:#A9713F;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 'Jost',system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:28px 20px 40px;display:flex;flex-direction:column;gap:18px}
+header{padding-bottom:16px;border-bottom:1px solid #5A4A25}
+.logo{font-size:28px;font-weight:300;letter-spacing:.14em;line-height:1;color:var(--gold)}
+.by{font-size:11px;letter-spacing:.28em;color:#B39556;margin-top:6px}
+h1{margin:0;font-size:24px;font-weight:400;letter-spacing:.02em;line-height:1.25}
+.sub{margin:4px 0 0;font-size:13px;color:var(--mut)}
+.filters{display:flex;gap:12px}
+.fld{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+label{font-size:12px;color:var(--mut)}
+select{height:44px;border-radius:8px;border:1px solid #3D372C;background:var(--card);color:var(--ink);font:inherit;font-size:15px;padding:0 10px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 14px 12px;min-width:0}
+.hero{padding:18px;display:flex;flex-direction:column;gap:6px}
+.lbl{font-size:13px;color:var(--mut)}
+.big{font-size:36px;font-weight:300;letter-spacing:.01em;line-height:1.15}
+.spark{position:relative;height:72px;margin-top:8px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.k .l{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:6px}
+.k b{font-size:18px;font-weight:500}
+.dot{width:8px;height:8px;border-radius:4px;display:inline-block}
+h2{margin:0 0 10px 4px;font-size:16px;font-weight:500}
+.cv{position:relative;height:230px}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin:10px 0 0 4px}
+.leg span{display:flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.row{display:grid;grid-template-columns:96px 1fr 48px;align-items:center;gap:10px;height:30px;font-size:13px}
+.row span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trk{height:8px;border-radius:4px;background:var(--line)}
+.fill{height:8px;border-radius:4px;background:var(--bronze)}
+.row .v{text-align:right;color:var(--mut)}
+.btn{height:44px;border-radius:10px;border:1px solid #3D372C;background:transparent;color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.note{font-size:12px;line-height:1.5;color:var(--mut)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+#err{border:1px solid var(--bronze);border-radius:10px;padding:12px;font-size:14px}
+</style></head><body><main>
+<header><div class="logo">WARMAN</div><div class="by">BY TANA WARMAN</div></header>
+<div><h1>Keuangan The Hive</h1><p class="sub" id="sub">Memuat data…</p></div>
+<div id="err" role="alert" hidden></div>
+<div class="filters">
+<div class="fld"><label for="f">Dari</label><select id="f"></select></div>
+<div class="fld"><label for="t">Sampai</label><select id="t"></select></div>
+</div>
+<section class="card hero"><div class="lbl">Saldo kas di akhir periode (menurut sheet)</div><div class="big" id="bal">-</div><div class="spark"><canvas id="c1" role="img" aria-label="Grafik saldo kas"></canvas></div></section>
+<section class="kpis">
+<div class="k"><div class="l"><span class="dot" style="background:var(--gold)"></span>Pendapatan Airbnb</div><b id="k1">-</b></div>
+<div class="k"><div class="l"><span class="dot" style="background:var(--bronze)"></span>Total pengeluaran</div><b id="k2">-</b></div>
+<div class="k"><div class="l">Hasil operasional</div><b id="k3">-</b><div class="l" id="k3s"></div></div>
+<div class="k"><div class="l">Modal masuk</div><b id="k4">-</b></div>
+</section>
+<button class="btn" type="button" id="pick">Coba CSV lain</button>
+<input id="file" type="file" accept=".csv,text/csv" hidden>
+<section class="card"><h2>Pendapatan dan pengeluaran per bulan</h2><div class="cv"><canvas id="c2" role="img" aria-label="Grafik batang pendapatan dan pengeluaran per bulan"></canvas></div>
+<div class="leg"><span><i class="sw" style="background:var(--gold)"></i>Pendapatan</span><span><i class="sw" style="background:var(--bronze)"></i>Pengeluaran</span><span><i class="sw" style="background:var(--ink);height:2px;width:14px"></i>Hasil operasional</span></div></section>
+<section class="card"><h2>Pengeluaran per kategori</h2><div id="cats"></div></section>
+<p class="note" id="note"></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script>
+/*PURE*/
+const KNOWN_ADJ=[['2026-03-01',2668394]];
+const LAB={'Inventory Purchase':'Perlengkapan','Laundry bills':'Laundry','Others':'Lain-lain','opc - Electricity Bill':'Listrik','opc - Home Service':'Home service','opc - Internet Bill':'Internet','opc - Repair & Maintenance':'Perbaikan','opc - Transportation':'Transportasi'};
+function parseCSV(t){const r=[];let row=[],f='',q=false;for(let i=0;i<t.length;i++){const c=t[i];if(q){if(c=='"'){if(t[i+1]=='"'){f+='"';i++}else q=false}else f+=c}else if(c=='"')q=true;else if(c==','){row.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&t[i+1]=='\n')i++;row.push(f);f='';if(row.some(x=>x!==''))r.push(row);row=[]}else f+=c}if(f!==''||row.length){row.push(f);if(row.some(x=>x!==''))r.push(row)}return r}
+const num=s=>{s=(s||'').replace(/[^\d.\-()]/g,'');if(!s)return 0;const n=parseFloat(s.replace(/[()]/g,''));return isNaN(n)?0:(s.includes('(')?-n:n)};
+function analyze(text){
+const R=parseCSV(text.replace(/^\uFEFF/,'')),H=R[0].map(h=>h.trim().toLowerCase()),ix=n=>H.indexOf(n);
+const iD=ix('date'),iC=ix('category'),iDe=ix('debit'),iCr=ix('credit'),iB=ix('balance'),iT=ix('details');
+if([iD,iC,iDe,iCr,iB].some(i=>i<0))throw new Error('Kolom wajib tidak lengkap: Date, Category, Debit, Credit, Balance.');
+const rows=R.slice(1).map(r=>{const p=(r[iD]||'').trim().split('/');if(p.length<3)return null;let y=+p[2];if(y<100)y+=2000;return{d:y+'-'+String(+p[1]).padStart(2,'0')+'-'+String(+p[0]).padStart(2,'0'),c:(r[iC]||'').trim(),de:num(r[iDe]),cr:num(r[iCr]),b:num(r[iB]),t:iT>=0?(r[iT]||''):''}}).filter(Boolean);
+if(!rows.length)throw new Error('Tidak ada baris data dengan tanggal berformat dd/mm/yy.');
+let a=0,b=0;rows.forEach((r,i)=>{if(!i)return;const dl=r.b-rows[i-1].b;if(Math.abs(dl-(r.cr-r.de))<1)a++;if(Math.abs(dl-(r.de-r.cr))<1)b++});
+const crIn=a>=b,miss=[];
+rows.forEach((r,i)=>{if(!i)return;const e=rows[i-1].b+(crIn?r.cr-r.de:r.de-r.cr);if(Math.abs(r.b-e)>=1)miss.push({d:r.d,x:r.b-e})});
+const mm={};let adjTot=0;
+rows.forEach(r=>{const inn=crIn?r.cr:r.de,out=crIn?r.de:r.cr,k=r.d.slice(0,7),m=mm[k]||(mm[k]={k,rev:0,cap:0,adj:0,exp:{}}),cl=r.c.toLowerCase();
+const isAdj=/balanc/i.test(r.t)||/adjust|balanc/.test(cl)||cl=='incoming transfer'||KNOWN_ADJ.some(x=>x[0]==r.d&&x[1]==inn&&cl=='revenue airbnb');
+if(isAdj){m.adj+=inn-out;adjTot+=inn-out}
+else if(cl=='revenue airbnb')m.rev+=inn-out;
+else if(cl=='investment inflow')m.cap+=inn-out;
+else if(inn>0&&out==0){m.adj+=inn;adjTot+=inn}
+else{const l=LAB[r.c]||r.c.replace(/^opc\s*-\s*/i,'')||'Lain-lain';m.exp[l]=(m.exp[l]||0)+out-inn}});
+const last={};rows.forEach(r=>last[r.d]=r.b);
+const bal=Object.keys(last).sort().map(d=>[d,last[d]]);
+const months=Object.values(mm).sort((x,y)=>x.k<y.k?-1:1);
+months.forEach(m=>{m.tot=Object.values(m.exp).reduce((s,v)=>s+v,0)});
+return{months,bal,crIn,miss,adjTot,last:bal[bal.length-1][0]}}
+/*ENDPURE*/
+const MN=['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const lb=k=>MN[+k.slice(5)-1]+' '+k.slice(2,4);
+const fd=d=>(+d.slice(8))+' '+MN[+d.slice(5,7)-1]+' '+d.slice(0,4);
+const fmt=n=>(n<0?'-':'')+'Rp '+Math.round(Math.abs(n)).toLocaleString('id-ID');
+const sh=n=>{const a=Math.abs(n),s=n<0?'-':'';return a>=1e6?s+(a/1e6).toFixed(1).replace('.',',')+' jt':a>=1e3?s+Math.round(a/1e3)+' rb':s+a};
+const $=id=>document.getElementById(id);
+const GOLD='#D4AF55',BRONZE='#A9713F',CREAM='#EFE8D6',MUT='#A9A08A',LINE='#2B2720';
+let D=null;
+Chart.defaults.font.family="'Jost',system-ui,sans-serif";Chart.defaults.color=MUT;
+const base={responsive:true,maintainAspectRatio:false};
+const c1=new Chart($('c1'),{type:'line',data:{labels:[],datasets:[{data:[],borderColor:GOLD,borderWidth:2,pointRadius:0,pointHoverRadius:4,stepped:true}]},options:Object.assign({interaction:{mode:'index',intersect:false},scales:{x:{display:false},y:{display:false}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)}}}},base)});
+const c2=new Chart($('c2'),{type:'bar',data:{labels:[],datasets:[{label:'Pendapatan',data:[],backgroundColor:GOLD,borderRadius:2},{label:'Pengeluaran',data:[],backgroundColor:BRONZE,borderRadius:2},{label:'Hasil operasional',type:'line',data:[],borderColor:CREAM,backgroundColor:CREAM,pointRadius:3,borderWidth:2}]},options:Object.assign({scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>v?sh(v):'0',maxTicksLimit:5},grid:{color:LINE}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}}},base)});
+function setup(){const M=D.months;['f','t'].forEach((id,j)=>{$(id).innerHTML=M.map((m,i)=>'<option value="'+i+'">'+lb(m.k)+'</option>').join('');$(id).value=j?M.length-1:0;$(id).onchange=render})}
+function render(){
+const M=D.months;let a=+$('f').value,b=+$('t').value;if(a>b){[a,b]=[b,a];$('f').value=a;$('t').value=b}
+const ms=M.slice(a,b+1),sum=f=>ms.reduce((s,m)=>s+f(m),0),rev=sum(m=>m.rev),exp=sum(m=>m.tot),net=rev-exp,cap=sum(m=>m.cap);
+$('sub').textContent=lb(M[a].k)+' sampai '+lb(M[b].k)+', data sampai '+fd(D.last);
+$('k1').textContent=fmt(rev);$('k2').textContent=fmt(exp);$('k3').textContent=fmt(net);$('k4').textContent=fmt(cap);
+$('k3s').textContent=rev?'Margin '+(net/rev*100).toFixed(0)+'% dari pendapatan':'';
+const s=M[a].k+'-01',e=M[b].k+'-31',pts=D.bal.filter(p=>p[0]>=s&&p[0]<=e);
+$('bal').textContent=pts.length?fmt(pts[pts.length-1][1]):'-';
+c1.data.labels=pts.map(p=>fd(p[0]));c1.data.datasets[0].data=pts.map(p=>p[1]);c1.update();
+c2.data.labels=ms.map(m=>lb(m.k)+(m.k==M[M.length-1].k?'*':''));
+c2.data.datasets[0].data=ms.map(m=>m.rev);c2.data.datasets[1].data=ms.map(m=>m.tot);c2.data.datasets[2].data=ms.map(m=>m.rev-m.tot);c2.update();
+const cat={};ms.forEach(m=>Object.entries(m.exp).forEach(([k,v])=>cat[k]=(cat[k]||0)+v));
+const en=Object.entries(cat).sort((x,y)=>y[1]-x[1]),mx=en.length?en[0][1]:1,box=$('cats');
+box.innerHTML='';
+en.forEach(([k,v])=>{const r=document.createElement('div');r.className='row';
+const n=document.createElement('span');n.textContent=k;
+const t=document.createElement('div');t.className='trk';const f=document.createElement('div');f.className='fill';f.style.width=Math.max(2,v/mx*100)+'%';t.appendChild(f);
+const x=document.createElement('span');x.className='v';x.textContent=sh(v);
+r.appendChild(n);r.appendChild(t);r.appendChild(x);box.appendChild(r)});
+$('note').textContent='* Data sampai '+fd(D.last);
+}
+function load(text){try{D=analyze(text);$('err').hidden=true;setup();render()}catch(x){$('err').hidden=false;$('err').textContent='Data tidak bisa dibaca: '+x.message}}
+fetch('data.csv?v='+Date.now()).then(r=>{if(!r.ok)throw new Error('data.csv tidak ditemukan di folder yang sama dengan index.html.');return r.text()}).then(load).catch(x=>{$('sub').textContent='';$('err').hidden=false;$('err').textContent=x.message+' Kamu juga bisa memilih file CSV lewat tombol Coba CSV lain.'});
+$('pick').onclick=()=>$('file').click();
+$('file').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(load)};
+</script></body></html>
